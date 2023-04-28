@@ -1,12 +1,24 @@
 #!/usr/bin/env bash
-# Run as root, echos pid into /var/run and traps then runs an infinite loop
+# Does the following:
+#   Create a file /var/run/myscript.pid containing the script PID.
+#   Displays "To infinity and beyond" indefinitely
+#   Displays "I hate the kill command" upon receiving a SIGTERM
+#   Displays "Y U no love me?!" upon receiving a SIGINT
+#   Deletes the file /var/run/myscript.pid and terminates upon
+#+  receiving a SIGQUIT or SIGTERM.
 
-echo $$ > /var/run/holbertonscript.pid
+terminator() {
+  rm /var/run/myscript.pid
+  exit
+}
 
-trap "echo 'Y U no love me?!'; exit 0; rm /var/run/holbertonscript.pid" SIGINT
-trap "echo 'I hate the kill command'; exit 0; rm /var/run/holbertonscript.pid" SIGTERM
+echo "$$" > /var/run/myscript.pid
 
-while :; do
-	echo To infinity and beyond
-	sleep 2
+while true
+do
+  echo "To infinity and beyond"
+  sleep 2
+  trap 'echo "Y U no love me?!"' SIGINT
+  trap 'echo "I hate the kill command" && terminator' SIGTERM
+  trap 'terminator' SIGQUITgit 
 done
